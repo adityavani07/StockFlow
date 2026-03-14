@@ -24,10 +24,6 @@ import {
 const uid = () => Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
 
 interface InventoryState {
-  // Theme
-  theme: 'light' | 'dark';
-  toggleTheme: () => void;
-
   // Auth
   currentUser: User | null;
   users: User[];
@@ -85,16 +81,6 @@ interface InventoryState {
 export const useInventoryStore = create<InventoryState>()(
   persist(
     (set, get) => ({
-      // ==================== THEME ====================
-      theme: 'dark',
-      toggleTheme: () => {
-        set(s => {
-          const next = s.theme === 'light' ? 'dark' : 'light';
-          document.documentElement.classList.toggle('dark', next === 'dark');
-          return { theme: next };
-        });
-      },
-
       // ==================== AUTH ====================
       currentUser: null,
       users: [seedUser],

@@ -1,12 +1,12 @@
 /**
- * SIDEBAR — macOS 26 glassy navigation with theme toggle.
- * Features vibrancy effect, smooth hover transitions, and accent glow.
+ * SIDEBAR — Main navigation for the IMS.
+ * Shows the app logo, navigation links grouped by section,
+ * and user profile at the bottom.
  */
 import React from 'react';
 import {
   LayoutDashboard, Package, ArrowDownToLine, Truck, ArrowLeftRight,
-  ClipboardList, History, LogOut, Warehouse, X, Menu,
-  Sun, Moon
+  ClipboardList, History, User, LogOut, Warehouse, X, Menu
 } from 'lucide-react';
 import { useInventoryStore } from '../store/inventoryStore';
 
@@ -22,48 +22,38 @@ const navItems = [
   { id: 'products', label: 'Products', icon: Package },
   { id: 'divider1', label: 'Operations', divider: true },
   { id: 'receipts', label: 'Receipts', icon: ArrowDownToLine },
-  { id: 'deliveries', label: 'Deliveries', icon: Truck },
-  { id: 'transfers', label: 'Transfers', icon: ArrowLeftRight },
-  { id: 'adjustments', label: 'Adjustments', icon: ClipboardList },
+  { id: 'deliveries', label: 'Delivery Orders', icon: Truck },
+  { id: 'transfers', label: 'Internal Transfers', icon: ArrowLeftRight },
+  { id: 'adjustments', label: 'Stock Adjustments', icon: ClipboardList },
   { id: 'moves', label: 'Move History', icon: History },
   { id: 'divider2', label: 'Settings', divider: true },
   { id: 'warehouses', label: 'Warehouses', icon: Warehouse },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, isOpen, onToggle }) => {
-  const { currentUser, logout, theme, toggleTheme } = useInventoryStore();
+  const { currentUser, logout } = useInventoryStore();
 
   return (
     <>
-      {/* Mobile overlay with blur */}
+      {/* Mobile overlay */}
       {isOpen && (
-        <div
-          className="fixed inset-0 z-40 lg:hidden"
-          style={{ background: 'var(--modal-overlay)', backdropFilter: 'blur(4px)' }}
-          onClick={onToggle}
-        />
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onToggle} />
       )}
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 h-full w-[260px] glass-sidebar z-50 flex flex-col
-        transform transition-transform duration-300 ease-out
+        fixed top-0 left-0 h-full w-64 bg-slate-900 text-white z-50 flex flex-col
+        transform transition-transform duration-200 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:z-auto
       `}>
-        {/* Header with logo */}
-        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--sidebar-border)' }}>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm text-white"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
-              SF
-            </div>
-            <div>
-              <span className="text-[15px] font-bold tracking-tight text-white">StockFlow</span>
-              <div className="text-[10px] text-white/40 font-medium tracking-wider uppercase">IMS Pro</div>
-            </div>
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+          <div className="flex items-center gap-2">
+            <img src={"/sf.svg"} alt="logo" width={40} height={40} style={{ borderRadius: '50%' }} />
+            <span className="text-lg font-bold tracking-tight">StockFlow</span>
           </div>
-          <button onClick={onToggle} className="lg:hidden text-white/40 hover:text-white transition-colors">
+          <button onClick={onToggle} className="lg:hidden text-slate-400 hover:text-white">
             <X size={20} />
           </button>
         </div>
@@ -73,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, isOpen, onTo
           {navItems.map(item => {
             if ('divider' in item && item.divider) {
               return (
-                <div key={item.id} className="mt-5 mb-2 px-3 text-[10px] font-semibold text-white/25 uppercase tracking-[0.12em]">
+                <div key={item.id} className="mt-5 mb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   {item.label}
                 </div>
               );
@@ -85,66 +75,38 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, isOpen, onTo
                 key={item.id}
                 onClick={() => { onNavigate(item.id); onToggle(); }}
                 className={`
-                  w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium
-                  transition-all duration-200 mb-0.5 relative group
+                  w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                  transition-colors duration-150 mb-0.5
                   ${isActive
-                    ? 'text-white'
-                    : 'text-white/50 hover:text-white/80 hover:bg-white/5'}
+                    ? 'bg-emerald-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'}
                 `}
-                style={isActive ? {
-                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2))',
-                  boxShadow: '0 0 20px rgba(99, 102, 241, 0.15)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
-                } : {}}
               >
-                <Icon size={17} strokeWidth={isActive ? 2.2 : 1.8} />
+                <Icon size={18} />
                 {item.label}
-                {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
-                    style={{ background: 'linear-gradient(to bottom, #6366f1, #8b5cf6)' }} />
-                )}
               </button>
             );
           })}
         </nav>
 
-        {/* Theme toggle + User section */}
-        <div style={{ borderTop: '1px solid var(--sidebar-border)' }} className="p-3 space-y-1">
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium
-              text-white/50 hover:text-white/80 hover:bg-white/5 transition-all duration-200"
-          >
-            {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-          </button>
-
-          {/* Profile */}
+        {/* User section */}
+        <div className="border-t border-slate-700 p-3">
           <button
             onClick={() => { onNavigate('profile'); onToggle(); }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200
-              ${currentPage === 'profile'
-                ? 'text-white bg-white/10'
-                : 'text-white/50 hover:text-white/80 hover:bg-white/5'}`}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 mb-1
+              ${currentPage === 'profile' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
           >
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: 'white' }}>
-              {currentUser?.name?.charAt(0)?.toUpperCase() || 'U'}
-            </div>
+            <User size={18} />
             <div className="text-left flex-1 min-w-0">
-              <div className="truncate text-white/80">{currentUser?.name || 'User'}</div>
-              <div className="text-[10px] text-white/30 truncate">{currentUser?.email}</div>
+              <div className="truncate">{currentUser?.name || 'User'}</div>
+              <div className="text-xs text-slate-400 truncate">{currentUser?.email}</div>
             </div>
           </button>
-
-          {/* Logout */}
           <button
             onClick={() => { logout(); }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium
-              text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-900/30 transition-colors"
           >
-            <LogOut size={17} />
+            <LogOut size={18} />
             Logout
           </button>
         </div>
@@ -155,8 +117,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, isOpen, onTo
 
 /** Mobile menu toggle button */
 export const MobileMenuButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-  <button onClick={onClick} className="lg:hidden p-2 rounded-xl transition-colors btn-ghost">
-    <Menu size={22} />
+  <button onClick={onClick} className="lg:hidden p-2 text-slate-600 hover:text-slate-900">
+    <Menu size={24} />
   </button>
 );
 

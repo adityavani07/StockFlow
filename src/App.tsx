@@ -1,6 +1,22 @@
 /**
- * APP.TSX — Root Component with macOS 26 Glass UI
- * Features animated mesh background, glass header, and smooth page transitions.
+ * APP.TSX — Root Component & Router
+ *
+ * Architecture:
+ * - If not authenticated → shows Auth page (login/signup)
+ * - If authenticated → shows Layout with sidebar + page content
+ * - Simple state-based routing (no react-router needed for single-page)
+ * - Responsive: sidebar collapses on mobile, toggles via hamburger
+ *
+ * Pages:
+ * - Dashboard (default landing after login)
+ * - Products (CRUD + stock visibility)
+ * - Receipts (incoming goods)
+ * - Deliveries (outgoing goods)
+ * - Transfers (internal stock movement)
+ * - Adjustments (stock corrections)
+ * - Move History (audit trail / stock ledger)
+ * - Warehouses (settings)
+ * - Profile (user settings)
  */
 import React, { useState } from 'react';
 import { useInventoryStore } from './store/inventoryStore';
@@ -15,17 +31,18 @@ import Adjustments from './pages/Adjustments';
 import MoveHistory from './pages/MoveHistory';
 import Warehouses from './pages/Warehouses';
 import Profile from './pages/Profile';
-import { Sun, Moon } from 'lucide-react';
 
 const App: React.FC = () => {
-  const { currentUser, theme, toggleTheme } = useInventoryStore();
+  const { currentUser } = useInventoryStore();
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Not authenticated → show login/signup
   if (!currentUser) {
     return <Auth />;
   }
 
+  // Render the correct page based on currentPage state
   const renderPage = () => {
     switch (currentPage) {
       case 'dashboard': return <Dashboard onNavigate={setCurrentPage} />;
@@ -41,6 +58,7 @@ const App: React.FC = () => {
     }
   };
 
+  // Page titles for the header
   const pageTitles: Record<string, string> = {
     dashboard: 'Dashboard',
     products: 'Products',
@@ -53,25 +71,8 @@ const App: React.FC = () => {
     profile: 'My Profile',
   };
 
-  const pageSubtitles: Record<string, string> = {
-    dashboard: 'Overview of your inventory operations',
-    products: 'Manage your product catalog',
-    receipts: 'Incoming goods from suppliers',
-    deliveries: 'Outgoing shipments to customers',
-    transfers: 'Move stock between locations',
-    adjustments: 'Correct stock discrepancies',
-    moves: 'Complete audit trail',
-    warehouses: 'Manage storage locations',
-    profile: 'Your account settings',
-  };
-
   return (
-    <div className="flex h-screen overflow-hidden relative" style={{ background: 'var(--bg-primary)' }}>
-      {/* Animated mesh background */}
-      <div className="mesh-bg">
-        <div className="mesh-bg-extra" />
-      </div>
-
+    <div className="flex h-screen bg-slate-50 overflow-hidden">
       {/* Sidebar */}
       <Sidebar
         currentPage={currentPage}
@@ -81,37 +82,25 @@ const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
-        {/* Top Header Bar — Glass */}
-        <header className="glass-heavy shrink-0 px-4 sm:px-6 py-3 flex items-center justify-between"
-          style={{ borderBottom: '1px solid var(--glass-border)' }}>
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top Header Bar */}
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <MobileMenuButton onClick={() => setSidebarOpen(true)} />
             <div>
-              <h2 className="text-[15px] font-bold" style={{ color: 'var(--text-primary)' }}>
+              <h2 className="text-lg font-bold text-slate-900 hidden sm:block">
                 {pageTitles[currentPage] || 'Dashboard'}
               </h2>
-              <p className="text-[11px] hidden sm:block" style={{ color: 'var(--text-tertiary)' }}>
-                {pageSubtitles[currentPage] || ''}
-              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 text-xs" style={{ color: 'var(--text-tertiary)' }}>
-              <div className="w-2 h-2 bg-emerald-400 rounded-full pulse-live"></div>
-              <span>Live</span>
+            <div className="hidden sm:flex items-center gap-2 text-sm text-slate-500">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+              Live
             </div>
             <button
-              onClick={toggleTheme}
-              className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 btn-ghost"
-              title={theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
-            >
-              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-            <button
               onClick={() => setCurrentPage('profile')}
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-white transition-all hover:scale-105"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
+              className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-sm font-bold text-emerald-600 hover:bg-emerald-200 transition-colors"
             >
               {currentUser.name.charAt(0).toUpperCase()}
             </button>
@@ -119,10 +108,8 @@ const App: React.FC = () => {
         </header>
 
         {/* Page Content — scrollable */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6" key={currentPage}>
-          <div className="animate-fadeIn">
-            {renderPage()}
-          </div>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+          {renderPage()}
         </main>
       </div>
     </div>

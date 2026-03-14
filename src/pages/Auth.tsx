@@ -1,6 +1,3 @@
-/**
- * AUTH PAGE — macOS 26 Glass Login with animated background
- */
 import React, { useState } from 'react';
 import { LogIn, UserPlus, KeyRound, ArrowLeft, Mail, Lock, User, Shield } from 'lucide-react';
 import { useInventoryStore } from '../store/inventoryStore';
@@ -13,7 +10,7 @@ const Auth: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const [loginEmail, setLoginEmail] = useState('alex@stockflow.com');
+  const [loginEmail, setLoginEmail] = useState('adiva@stockflow.com');
   const [loginPassword, setLoginPassword] = useState('admin123');
 
   const [signupName, setSignupName] = useState('');
@@ -148,7 +145,7 @@ const Auth: React.FC = () => {
                   Forgot password?
                 </button>
                 <div className="text-[11px] text-white/20 text-center p-2.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                  Demo: alex@stockflow.com / admin123
+                  Demo: adiva@stockflow.com / admin123
                 </div>
               </form>
             )}
