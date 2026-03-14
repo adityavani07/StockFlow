@@ -24,7 +24,7 @@ export function Login() {
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="space-y-1 flex flex-col items-center">
           <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-            <Package className="h-8 w-8 text-white" />
+            <img src="/logo.png" alt="StockFlow Logo" className="w-15 h-25" />
           </div>
           <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">StockFlow</CardTitle>
           <CardDescription>Sign in to your inventory management system</CardDescription>
